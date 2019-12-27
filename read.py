@@ -40,6 +40,8 @@ if __name__=="__main__":
                     child_dictionary[l[i]]=row_data[j]
                     #print(l[i]," : ",row_data[j])
                 i=i+1
+            print("Child is",child_dictionary)
+                
         parent_dictionary_array.append(child_dictionary)
         #print()
     #for i in range(0,len(parent_dictionary_array)):
@@ -47,7 +49,7 @@ if __name__=="__main__":
     #    print("\n")  #professions_dict = {}
     
     #db.test.insert_many(parent_dictionary_array)    
-    db.test.find()
+    
     #print(l)
 
 
