@@ -2,10 +2,19 @@ import search_files as searchFiles
 import pandas as pd
 import xlrd
 import datetime
-import pymongo
+import json
+#import pymongo
+
+#from elasticsearch import Elasticsearch
+#URLS=['http://127.0.0.1:9200']
+#es=Elasticsearch(URLS)
+#INDEX='newtest'
+#res=es.indices.create(index=INDEX,ignore=400)
+#print(res)
 
 
-client = pymongo.MongoClient("mongodb://127.0.0.1:27017/?gssapiServiceName=mongodb")
+
+#client = pymongo.MongoClient("mongodb://127.0.0.1:27017/?gssapiServiceName=mongodb")
 
 
 def store_the_headers_in_file(headers):
@@ -13,28 +22,40 @@ def store_the_headers_in_file(headers):
     print("File_Path \t Tuples")
     Final_to_display=list(zip(searchFiles.address,headers))
 
+    f= open('logs.txt','w+')
+
     # This will print the headers of every file in terminal : [(file_name, [list_of_headers])]
     for i in range(0,len(Final_to_display)):
+        f.write("--------->>>>>>".join([Final_to_display[i][0], ",".join(Final_to_display[i][1])]))
+        f.write("\n")
         print(Final_to_display[i][0], "\t" , Final_to_display[i][1])
 
-
+    f.close()
 
 def display_skipped_files_path(list_of_path):
     print("Files Skipped : ")
     print("Sr.No \t File_PATH")
     
+    f=open('skipped_files.txt','w+')
+
     for i in range(0,len(list_of_path)):
+        f.write(str(list_of_path[i]))
+        f.write("\n")
+
         print(i+1,"\t",list_of_path[i])
 
-
+    f.close()
 
 
 
 headers=[]
 files_skipped=[]
+elements=0
+
+get_Headers_Dictionary={}
 
 if __name__=="__main__":
-    db = client.test
+    #db = client.test
 
     print(searchFiles.address)
     print("Total number of xlsx files : ",len(searchFiles.address))
@@ -61,6 +82,11 @@ if __name__=="__main__":
             cols_per_file=list(map(str,df.columns))
             for each_in_list in range(0,len(cols_per_file)):
                 cols_per_file[each_in_list]=str(cols_per_file[each_in_list]).replace(".","_").strip().lower()
+                if cols_per_file[each_in_list] in get_Headers_Dictionary:
+                    get_Headers_Dictionary[cols_per_file[each_in_list]]+=1
+                else:
+                    get_Headers_Dictionary[cols_per_file[each_in_list]]=1
+                #print(get_Headers_Dictionary)
 
             headers.append(cols_per_file)
 
@@ -82,9 +108,13 @@ if __name__=="__main__":
                         i=i+1
                     
                     #print("Child is ",child_dictionary)
-                parent_dictionary_array.append(child_dictionary)
+                #print(es.create(INDEX,'data_set_newTest',elements,body=child_dictionary))
+                #elements+=1
+
+                #parent_dictionary_array.append(child_dictionary)
             #print(parent_dictionary_array)
-            db.test.insert_many(parent_dictionary_array)
+            
+            #db.test.insert_many(parent_dictionary_array)
 
 
 
@@ -98,4 +128,11 @@ if __name__=="__main__":
 
     store_the_headers_in_file(headers)
     display_skipped_files_path(files_skipped)    
+    print()
+
+    print('Headers are :')
+    print(get_Headers_Dictionary)
+    with open('headers.txt','w') as outfile:
+        json.dump(get_Headers_Dictionary,outfile)
+        
     

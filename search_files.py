@@ -6,7 +6,7 @@ address=[]
 for root, dirs, files in os.walk(".", topdown=False):
    for name in files:
  
-        if os.path.join(root,name).endswith('.xlsx'):
+        if os.path.join(root,name).lower().endswith('.xlsx') or  os.path.join(root,name).lower().endswith('.xls'):
             address.append(os.path.join(root, name))
             
    #for name in dirs:
